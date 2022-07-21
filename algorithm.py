@@ -1,12 +1,52 @@
-import numpy as np
-import cv2
+import findRedArea
 from fallTime import FallTime   # return time (Flight time -> params: height)
 from distance import Distance   # return distance (Drift distance -> params: velocity, time)
 from area import Area           # return redArea, bufferArea (Area Size -> params: NULL)
 from speedUAV import SpeedUAV   # return speed (Net Speed -> params: speedUAV, windSpeed)
+from dronekit import connect
+from gpsDistance import GPSDistance     # return distance (GPS Distance -> params: UAV GPS, Area GPS)
+from mathDistance import MathDistance   # return distance (Maths Distance -> params: Height, camera angle)
+
+connection_string = "TCP"
+uav = connect(ip=connection_string, wait_ready=True, timeout=100, baud=115200)
+
+try:
+    while(1):
+        v = SpeedUAV(
+            speed = uav.groundspeed, 
+            windSpeed = uav.airspeed
+        ).returner()
+        
+        t = FallTime(
+            height = uav.location.global_relative_frame.alt
+        ).returner()
+        
+        x = Distance(
+            velocity = v, 
+            time = t
+        ).returner()
+
+        math_x = MathDistance(
+            height = uav.location.global_relative_frame.alt,
+            cameraAngle = 60
+        ).returner()
+    
+    gps_x = GPSDistance(
+        uavLat = uav.location.global_relative_frame.lat,
+        uavLon = uav.location.global_relative_frame.lon,
+        areaLat = 0,    #0 ise konum belirlenir top birakmaz - servo calismaz
+        areaLon = 0
+    ).returner()
+except:
+    pass
+finally:
+    pass
+
 
 """
-    ! Hersey nanosaniye (saniye * 10**(-9))
+    ! Saniye cinsinden
+    ! Metre cinsinden
+    ! Gram cinsinden
 
     * Raspberry Pi 4 gecikmesi
     ? 1.5 GHz dört çekirdekli ARM Cortex-A72 CPU
@@ -43,11 +83,3 @@ def gHzConvert(gHz):
 def fpsConvert(fps):
     v = 0.3048 * fps
     return v
-
-try:
-    pass
-except:
-    pass
-finally:
-    pass
-

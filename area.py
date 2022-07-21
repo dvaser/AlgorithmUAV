@@ -2,11 +2,18 @@ import math
 
 #? return redArea, bufferArea (Area Size -> params: NULL)
 class Area:
-    def __init__(self, width=25, height=10, R=2.5):
+    def __init__(self, width=25, height=10, R=2.5, x=0, y=0):
+        # Area Coordinate
+        self.x = x
+        self.y = y
+
         self.pi = math.pi
+        # Area Width & Height 
         self.w = width
         self.h = height
+        # Area Diameter
         self.R = R
+        # Area Size
         self.redArea = self.redAreaCalculator()
         self.bufferArea = self.bufferAreaCalculator()
 
