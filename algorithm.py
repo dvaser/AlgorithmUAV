@@ -1,4 +1,4 @@
-import findRedArea
+from findRedArea import FindRedArea
 from fallTime import FallTime   # return time (Flight time -> params: height)
 from distance import Distance   # return distance (Drift distance -> params: velocity, time)
 from area import Area           # return redArea, bufferArea (Area Size -> params: NULL)
@@ -6,11 +6,22 @@ from speedUAV import SpeedUAV   # return speed (Net Speed -> params: speedUAV, w
 from dronekit import connect
 from gpsDistance import GPSDistance     # return distance (GPS Distance -> params: UAV GPS, Area GPS)
 from mathDistance import MathDistance   # return distance (Maths Distance -> params: Height, camera angle)
+from gpsArea import GPSArea     # return coordinate (Red Area GPS Coordinate -> params: UavLat, UavLon, Lat, Lon)
+
 
 connection_string = "TCP"
 uav = connect(ip=connection_string, wait_ready=True, timeout=100, baud=115200)
 
 try:
+    while (FindRedArea.returner()):    
+        areaGPS = GPSArea(
+            uavLat = uav.location.global_relative_frame.lat,
+            uavLon = uav.location.global_relative_frame.lon,
+            lat = 0,
+            lon = 0
+        ).returner()
+        break
+
     while(1):
         v = SpeedUAV(
             speed = uav.groundspeed, 
@@ -31,12 +42,12 @@ try:
             cameraAngle = 60
         ).returner()
     
-    gps_x = GPSDistance(
-        uavLat = uav.location.global_relative_frame.lat,
-        uavLon = uav.location.global_relative_frame.lon,
-        areaLat = 0,    #0 ise konum belirlenir top birakmaz - servo calismaz
-        areaLon = 0
-    ).returner()
+        gps_x = GPSDistance(
+            uavLat = uav.location.global_relative_frame.lat,
+            uavLon = uav.location.global_relative_frame.lon,
+            areaGPS = areaGPS 
+        ).returner()
+
 except:
     pass
 finally:
