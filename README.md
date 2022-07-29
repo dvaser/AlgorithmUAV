@@ -7,7 +7,7 @@
 >> *Dogukan Vatansever* ( ***`Nick`*** *: Dvase* )
 
 > **`Social Media Accounts`**
-    >> *Links :* *[Click Here](https://Linktr.ee/Dvaser)*
+>> *Links :* *[Click Here](https://Linktr.ee/Dvaser)*
 
 <br>
 
