@@ -1,26 +1,37 @@
 from math import cos, pi, atan
+from operator import ifloordiv
 import numpy as np
+from coordinate import Coordinate
+from mathDistance import MathDistance   # return distance (Maths Distance -> params: Height, camera angle)
 import cv2
 
 class FindRedArea:
-    def __init__(self, cameraAngle=60):
-        self.isRed = False
-        self.redArea(cameraAngle=cameraAngle)
+    def __init__(self, height=0, cameraAngle=60, areaRadius=2.5, count = 100):
+        self.isOkay = True
+        self.redArea(height=height ,cameraAngle=cameraAngle, areaRadius=areaRadius, count=count)
+        self.countRed = 0
         self.areaSize = 0
+        self.areaGPS = 0,0
 
-    def radiusArea(self, height=0, size=2.5):
-        radian = atan((size/2)/height)
-        angle = radian*180/pi*2
-        A = ((angle*size/180) ** 2) * pi  # area size -> pi*r2
-        return A
+    def radiusArea(self, height=0, size=2.5, cameraAngle=60):
+        if height != 0: radian = atan((size/2)/height); angle = radian*180/pi*2
+        else: angle = 180
+        return (((size*angle/180)/2) ** 2) * pi #* cos(cameraAngle*pi/180) # area size -> pi*r2
 
-    def redArea(self, cameraAngle):
+    def redArea(self, height=0, cameraAngle=60, areaRadius=2.5, count=1000):
         # Capturing video through webcam
         webcam = cv2.VideoCapture(1)
-        self.angle = cameraAngle
 
-        # Start a while loop
+        hFrame,wFrame,__ = webcam.read()[1].shape
+        countRed = 0
+        # Start a while loop   
         while(1):
+            
+            if(countRed > count):
+                self.isOkay = False
+                webcam.release()
+                cv2.destroyAllWindows()
+                break
 
             # Reading the video from the webcam in image frames
             _, imageFrame = webcam.read()
@@ -43,29 +54,46 @@ class FindRedArea:
             contours, hierarchy = cv2.findContours(redMask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
             for pic, contour in enumerate(contours):
-                # epsilon = 0.001*cv2.arcLength(contour, True)
-                # approx = cv2.approxPolyDP(contour, epsilon, True)
+                epsilon = 0.001*cv2.arcLength(contour, True)
+                approx = cv2.approxPolyDP(contour, epsilon, True)
 
-                area = cv2.contourArea(contour)
-
-                if( 2000 > area > 600):
-                    self.isRed = True
+                area = cv2.contourArea(approx)
+                areaReelSize = self.radiusArea(height=height, size=areaRadius, cameraAngle=cameraAngle)*(3779.5275590551**2) 
+                
+                if(area > 300):
+                #if(areaReelSize+100 > (area) > areaReelSize-100):
                     x, y, w, h = cv2.boundingRect(contour)
                     imageFrame = cv2.rectangle(imageFrame, (x, y), (x + w, y + h), (0, 0, 255), 2)
+                    
+                    xRedArea = x + int(w/2)
+                    yRedArea = y + int(h/2)
+                    
+                    cv2.circle(imageFrame, (xRedArea, yRedArea), 2, (0, 255, 0), 4)
+                    cv2.circle(imageFrame, (int(wFrame/2), int(hFrame/2)), 2, (0, 255, 0), 4)
+                    cv2.line(imageFrame, (xRedArea, yRedArea), (int(wFrame/2), int(hFrame/2)), (255,0,0), 2)
 
-                    self.areaSize = w*h*pi*cos(self.angle/180*pi)/3779.5275590551   # m of px
-                    print(self.areaSize, self.radiusArea(0.6))
-                else:
-                    self.isRed = False
+                    self.areaGPS = self.latLonCalculator(height=height, x=xRedArea-int(wFrame/2)/(3779.5275590551), y=yRedArea-int(hFrame/2)/(3779.5275590551), cameraAngle=cameraAngle)
+                    countRed += 1
+                    point = Coordinate(areaGPS=self.areaGPS)
 
             # Program Termination
             cv2.imshow("Red Area", imageFrame)
+
             if cv2.waitKey(10) & 0xFF == ord('q'):
                 webcam.release()
                 cv2.destroyAllWindows()
                 break
 
-    def returner(self):
-        return self.isRed
+    def latLonCalculator(self, height=0, x=0, y=0, cameraAngle=60):
+        lonDiff = MathDistance(height=height, cameraAngle=cameraAngle).returner()
+        try:
+            latDiff = (x*lonDiff)/y
+        except Exception:
+            latDiff = 0
 
-FindRedArea()
+        return latDiff, lonDiff
+
+    def returner(self):
+        return self.isOkay
+
+# redArea = FindRedArea(areaRadius=0.09, height=0.6, cameraAngle=60, count=50)

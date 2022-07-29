@@ -1,11 +1,9 @@
 
-
 class GPSArea:
-    def __init__(self, uavLat=0, uavLon=0, lat=0, lon=0):
+    def __init__(self, uavLat=0, uavLon=0, areaDiffGPS={0,0}):
         self.uavLat = uavLat
         self.uavLon = uavLon
-        self.lat = lat
-        self.lon = lon
+        self.lat, self.lon = areaDiffGPS
     
     def GPSRedArea(self):
         self.areaLat = self.uavLat + self.lat
