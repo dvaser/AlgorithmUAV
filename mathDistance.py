@@ -1,3 +1,5 @@
+#? return distance (Maths Distance -> params: height, cameraAngle)
+
 from math import tan, pi
 
 class MathDistance:
@@ -6,6 +8,7 @@ class MathDistance:
         self.r = cameraAngle    # Angle with upper base
         self.x = self.calculator()
 
+    # Calculate
     def calculator(self):
         return ( self.h * tan(90-self.r/180*pi) )
 

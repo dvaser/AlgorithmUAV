@@ -1,11 +1,12 @@
 from math import sqrt
 import math
 
+#! Ball drop time from the UAV to the target
 #? return time (Flight time -> params: height)
 class FallTime:
-    # height -> UAV height
-    # velocity -> Object Drop Velocity
-    # heightRedChnl -> Red Channel Ground Clearance
+    # height -> UAV height (m)
+    # velocity -> Object Drop Velocity (m/s)
+    # heightRedChnl -> Red Channel Ground Clearance (m)
     def __init__(self, height=0, R=0, m=140, heightRedChnl = 0.1, T=27, velocity=0):
         # Gravitation (m/s2)
         self.g = 9.80665 
@@ -32,9 +33,11 @@ class FallTime:
         # K (kg/m3)
         return ( self.Pa / (287.052 * (self.T + 273.15)) )
 
+    # Limit speed 
     def limitSpeed(self):
         return sqrt((self.m*self.g)/(self.K*self.A))
 
+    # Fall time
     def timeCalculator(self):
         """
         if (self.v > self.Vlim):

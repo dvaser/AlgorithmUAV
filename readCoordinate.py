@@ -1,3 +1,4 @@
+#? return lat, lon (Read to Coordinate -> params: None)
 
 class ReadCoordinate:
     def __init__(self):
@@ -23,8 +24,13 @@ class ReadCoordinate:
                 else:
                     num += (i)
 
-        # txt dosyasina yaz oradan dondur
-        return (sum(Lat)/len(Lat)), (sum(Lon)/len(Lon))
+        lat = (sum(Lat)/len(Lat))
+        lon = (sum(Lon)/len(Lon))
+
+        file.close()
+        open(self.filePath, "w", encoding="utf-8").close()
+        
+        return lat, lon
 
     def returner(self):
         return self.readCoordinate()
