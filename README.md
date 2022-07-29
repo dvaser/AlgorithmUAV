@@ -4,7 +4,7 @@
 <br>
 
 > **`Author`**
->> *Dogukan Vatansever* ( ***`Nick`*** *: Dvase* )
+>> *Dogukan Vatansever* ( *Dvase* )
 
 > **`Social Media Accounts`**
 >> *Links :* *[Click Here](https://Linktr.ee/Dvaser)*
