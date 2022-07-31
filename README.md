@@ -1,4 +1,4 @@
-# UAVIPMA
+# ALGORITHM
 
 ### **UAV Image Processing Algorithm**
 <br>
